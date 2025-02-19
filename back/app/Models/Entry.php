@@ -2,9 +2,14 @@
 
 namespace App\Models;
 
+use App\Enums\Entry\Status;
 use Illuminate\Database\Eloquent\Model;
 
 class Entry extends Model
 {
     protected $fillable = ['status', 'content'];
+
+    protected $casts = [
+        'status' => Status::class,
+    ];
 }
