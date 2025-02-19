@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\Entry\Status;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreEntryRequest extends FormRequest
 {
@@ -22,7 +24,11 @@ class StoreEntryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'status' => [
+                'required',
+                Rule::in(array_column(Status::cases(), 'value')),
+            ],
+            'content' => ['required', 'string', 'max:1000'],
         ];
     }
 }

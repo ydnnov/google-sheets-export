@@ -23,7 +23,10 @@ class EntryController extends Controller
 
     public function store(StoreEntryRequest $request)
     {
-        return 'create entry';
+        $validated = $request->validated();
+        $entry = Entry::create($validated);
+
+        return new EntryResource($entry);
     }
 
     public function show(Entry $entry)
