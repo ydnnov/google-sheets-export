@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\Entry\Status;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateEntryRequest extends FormRequest
 {
@@ -22,7 +24,11 @@ class UpdateEntryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'status' => [
+                'sometimes',
+                Rule::in(array_column(Status::cases(), 'value')),
+            ],
+            'content' => ['sometimes', 'string', 'max:1000'],
         ];
     }
 }

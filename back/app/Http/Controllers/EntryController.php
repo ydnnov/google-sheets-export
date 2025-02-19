@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateEntryRequest;
 use App\Http\Resources\EntryResource;
 use App\Models\Entry;
 use App\Services\GenerateEntriesService;
+use Illuminate\Http\Response;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class EntryController extends Controller
@@ -31,17 +32,22 @@ class EntryController extends Controller
 
     public function show(Entry $entry)
     {
-        return 'get entry';
+        return new EntryResource($entry);
     }
 
     public function update(UpdateEntryRequest $request, Entry $entry)
     {
-        return 'update entry';
+        $validated = $request->validated();
+        $entry->update($validated);
+
+        return new EntryResource($entry);
     }
 
     public function destroy(Entry $entry)
     {
-        return 'destroy entry';
+        $entry->delete();
+
+        return response()->json(['message' => 'Entry deleted'], Response::HTTP_NO_CONTENT);
     }
 
     public function generate(GenerateEntriesService $generator)
