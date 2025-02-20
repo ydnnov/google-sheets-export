@@ -17,7 +17,8 @@ class EntryController extends Controller
         $entries = QueryBuilder::for(Entry::class)
             ->allowedFilters(['status'])
             ->allowedSorts(['id', 'status', 'created_at'])
-            ->paginate();
+            ->defaultSort('id')
+            ->paginate(request()->query('per_page') ?? 10);
 
         return EntryResource::collection($entries);
     }

@@ -3,6 +3,11 @@ export type RecordType = {
   created_at: string
 }
 
+export type GetManyParamsType = {
+  page: number
+  per_page: number
+}
+
 export type GetManyResponseType<TRecord> = {
   data: TRecord[]
   links: {

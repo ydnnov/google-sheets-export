@@ -1,10 +1,19 @@
 import { http } from '@/http.ts';
-import type { GetManyResponseType } from '@/types/common.ts';
+import type { GetManyParamsType, GetManyResponseType } from '@/types/common.ts';
 import type { EntryType } from '@/types/entry.ts';
 
 export const entriesClient = {
-  async getMany(): GetManyResponseType<EntryType> {
-    const response = await http.get('entries');
+  async getMany(
+    params: Partial<GetManyParamsType>,
+  ): GetManyResponseType<EntryType> {
+    const usedParams: GetManyParamsType = {
+      page: 1,
+      per_page: 10,
+      ...params,
+    };
+    const response = await http.get('entries', {
+      params: usedParams,
+    });
     return response.data;
   },
   async getOne(id: number): EntryType | null {
