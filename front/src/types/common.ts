@@ -5,7 +5,9 @@ export type RecordType = {
 
 export type GetManyParamsType = {
   page: number
-  per_page: number
+  perPage: number
+  sortField: string
+  sortOrder: 'asc' | 'desc'
 }
 
 export type GetManyResponseType<TRecord> = {

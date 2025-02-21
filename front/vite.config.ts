@@ -14,7 +14,7 @@ export default defineConfig({
     vue(),
     vueDevTools(),
     AutoImport({
-      imports: ['vue', 'vue-router'],
+      imports: ['vue', 'vue-router', '@vueuse/core'],
     }),
     tailwindcss(),
     Components({

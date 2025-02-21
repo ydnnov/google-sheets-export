@@ -1,19 +1,37 @@
 <script setup lang="ts">
 import { entriesClient } from '@/client/entries.ts';
-import type { GetManyResponseType } from '@/types/common.ts';
+import type { GetManyParamsType, GetManyResponseType } from '@/types/common.ts';
 import type { EntryType } from '@/types/entry.ts';
 import type { Ref } from 'vue';
 import type { DataTablePageEvent } from 'primevue';
 
 const entries: Ref<GetManyResponseType<EntryType>> = ref();
-onMounted(async () => {
-  entries.value = await entriesClient.getMany();
+const queryParams: GetManyParamsType = reactive({
+  page: 1,
+  perPage: 10,
+  sortField: 'id',
+  sortOrder: 'asc',
 });
-const onUpdatePage = async (ev: DataTablePageEvent) => {
-  entries.value = await entriesClient.getMany({
-    page: ev.page + 1,
-    per_page: ev.rows,
-  });
+const updateTable = useDebounceFn(async () => {
+  entries.value = await entriesClient.getMany(queryParams);
+}, 100);
+onMounted(() => {
+  updateTable();
+});
+const onUpdatePage = (ev: DataTablePageEvent) => {
+  queryParams.page = ev.page + 1;
+  queryParams.perPage = ev.rows;
+  updateTable();
+};
+const onUpdateSortField = (field: string) => {
+  queryParams.sortField = field;
+  queryParams.page = 1;
+  updateTable();
+};
+const onUpdateSortOrder = (order: number) => {
+  queryParams.sortOrder = order > 0 ? 'asc' : 'desc';
+  queryParams.page = 1;
+  updateTable();
 };
 </script>
 <template>
@@ -33,11 +51,13 @@ const onUpdatePage = async (ev: DataTablePageEvent) => {
           :rows="5"
           :total-records="entries.meta.total"
           @page="onUpdatePage"
+          @update:sort-field="onUpdateSortField"
+          @update:sort-order="onUpdateSortOrder"
       >
-        <Column field="id" header="ID"></Column>
-        <Column field="status" header="Status"></Column>
+        <Column field="id" header="ID" sortable></Column>
+        <Column field="status" header="Status" sortable></Column>
         <Column field="content" header="Content"></Column>
-        <Column field="created_at" header="Created at"></Column>
+        <Column field="created_at" header="Created at" sortable></Column>
       </DataTable>
     </div>
   </div>
