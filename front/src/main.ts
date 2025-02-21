@@ -18,7 +18,10 @@ app.use(PrimeVue, {
     options: {
       prefix: 'p',
       darkModeSelector: 'system',
-      cssLayer: false,
+      cssLayer: {
+        name: 'primevue',
+        order: 'theme, base, components, primevue, utilities',
+      },
     },
   },
 });
