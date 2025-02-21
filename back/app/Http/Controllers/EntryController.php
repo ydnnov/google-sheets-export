@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\GenerateEntriesRequest;
 use App\Http\Requests\StoreEntryRequest;
 use App\Http\Requests\UpdateEntryRequest;
 use App\Http\Resources\EntryResource;
@@ -51,9 +52,20 @@ class EntryController extends Controller
         return response()->json(['message' => 'Entry deleted'], Response::HTTP_NO_CONTENT);
     }
 
-    public function generate(GenerateEntriesService $generator)
+    public function deleteAll()
     {
-        $generator->createEntries(1000);
+        Entry::query()->delete();
+
+        return response()->json(['message' => 'All entries deleted'], Response::HTTP_NO_CONTENT);
+    }
+
+    public function generate(
+        GenerateEntriesRequest $request,
+        GenerateEntriesService $generator
+    )
+    {
+        $numRecords = $request->json('numRecords');
+        $generator->createEntries($numRecords);
         return response()->json(['message' => 'Entries created']);
     }
 }

@@ -22,6 +22,7 @@ const queryParams: GetManyParamsType = reactive({
   sortField: 'id',
   sortOrder: 'asc',
 });
+const showProgressBar = ref(false);
 if (storage.value) {
   try {
     const tableState = JSON.parse(storage.value);
@@ -64,10 +65,13 @@ const createRecord = () => {
 const editRecord = (id: number) => {
   router.push({ name: 'entry.edit', params: { id } });
 };
-const confirmDelete = (event, id: number) => {
+const confirmDelete = (event, id: number | 'all') => {
+  const message = id === 'all' ?
+      'Do you want to delete ALL records?' :
+      'Do you want to delete this record?';
   confirm.require({
     target: event.currentTarget,
-    message: 'Do you want to delete this record?',
+    message,
     icon: 'pi pi-info-circle',
     rejectProps: {
       label: 'Cancel',
@@ -79,7 +83,11 @@ const confirmDelete = (event, id: number) => {
       severity: 'danger',
     },
     accept: async () => {
-      await entriesClient.delete(id);
+      if (id === 'all') {
+        await entriesClient.deleteAll();
+      } else {
+        await entriesClient.delete(id);
+      }
       toast.add({ severity: 'info', summary: 'Confirmed', detail: 'Record deleted', life: 3000 });
       updateTable();
     },
@@ -87,12 +95,57 @@ const confirmDelete = (event, id: number) => {
     },
   });
 };
+const confirmGenerate = (event) => {
+  confirm.require({
+    target: event.currentTarget,
+    message: 'Do you want to generate 1000 records?',
+    icon: 'pi pi-info-circle',
+    rejectProps: {
+      label: 'Cancel',
+      severity: 'secondary',
+      outlined: true,
+    },
+    acceptProps: {
+      label: 'Generate',
+      severity: 'info',
+    },
+    accept: async () => {
+      showProgressBar.value = true;
+      entriesClient.generate(1000)
+          .then(() => {
+            showProgressBar.value = false;
+            toast.add({ severity: 'info', summary: 'Finished', detail: 'Generated 1000 records', life: 3000 });
+            updateTable();
+          });
+    },
+    reject: () => {
+    },
+  });
+};
 </script>
 <template>
+  <ProgressBar
+      class="fixed top-0 left-0 right-0 z-100"
+      style="height: 10px;"
+      v-if="showProgressBar"
+      mode="indeterminate"
+  />
   <div>
     <h1>Entries</h1>
-    <div>
+    <div class="flex justify-end">
       <Button @click="createRecord">Create</Button>
+      <Button
+          class="ml-4"
+          @click="confirmDelete($event, 'all')"
+          severity="danger"
+      >Delete all
+      </Button>
+      <Button
+          class="ml-4"
+          @click="confirmGenerate($event)"
+          severity="info"
+      >Generate
+      </Button>
     </div>
     <div v-if="entries">
       <DataTable

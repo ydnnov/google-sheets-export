@@ -57,9 +57,24 @@ export const entriesClient = {
       };
     }
   },
+  async generate(numRecords: number): boolean {
+    if (numRecords > 1000) {
+      throw new Error('Maximum of 1000 records is allowed');
+    }
+    const result = await http.post(`entries/generate`, { numRecords });
+    return result.data;
+  },
   async delete(id: number): boolean {
     try {
       await http.delete(`entries/${id}`);
+      return true;
+    } catch (AxiosError) {
+      return false;
+    }
+  },
+  async deleteAll(): boolean {
+    try {
+      await http.post(`entries/delete-all`);
       return true;
     } catch (AxiosError) {
       return false;

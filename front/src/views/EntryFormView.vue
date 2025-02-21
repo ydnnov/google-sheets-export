@@ -32,6 +32,7 @@ const save = async () => {
         detail: 'Entry successfully created',
         life: 3000,
       });
+      entriesListBus.emit('refresh');
       router.push({ name: 'entry.edit', params: { id: result.data.id } });
     } else {
       formErrors.value = result.details.errors;

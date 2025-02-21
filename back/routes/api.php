@@ -10,3 +10,4 @@ Route::get('/user', function (Request $request) {
 
 Route::apiResource('entries', EntryController::class);
 Route::post('entries/generate', [EntryController::class, 'generate']);
+Route::post('entries/delete-all', [EntryController::class, 'deleteAll']);
