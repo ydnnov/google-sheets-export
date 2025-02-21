@@ -14,7 +14,7 @@ class EntryResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'status' => $this->status->name,
+            'status' => $this->status->value,
             'content' => $this->content,
             'created_at' => $this->created_at->toDateTimeString(),
         ];

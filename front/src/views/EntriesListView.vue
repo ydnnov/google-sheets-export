@@ -4,6 +4,7 @@ import type { GetManyParamsType, GetManyResponseType } from '@/types/common.ts';
 import type { EntryType } from '@/types/entry.ts';
 import type { Ref } from 'vue';
 import type { DataTablePageEvent } from 'primevue';
+import { EntryStatusEnum } from '../enums/EntryStatus.ts';
 
 const entries: Ref<GetManyResponseType<EntryType>> = ref();
 const queryParams: GetManyParamsType = reactive({
@@ -55,7 +56,11 @@ const onUpdateSortOrder = (order: number) => {
           @update:sort-order="onUpdateSortOrder"
       >
         <Column field="id" header="ID" sortable></Column>
-        <Column field="status" header="Status" sortable></Column>
+        <Column field="status" header="Status" sortable>
+          <template #body="{ data }">
+            {{ EntryStatusEnum[data.status] }}
+          </template>
+        </Column>
         <Column field="content" header="Content"></Column>
         <Column field="created_at" header="Created at" sortable></Column>
       </DataTable>
