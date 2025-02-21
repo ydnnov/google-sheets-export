@@ -40,4 +40,21 @@ export const entriesClient = {
       };
     }
   },
+  async update(
+    id: number,
+    formData: Partial<EntryBaseType>,
+  ): GenericResultType<EntryType> {
+    try {
+      const response = await http.patch(`entries/${id}`, formData);
+      return {
+        success: true,
+        data: response.data.data,
+      };
+    } catch (e: AxiosError) {
+      return {
+        success: false,
+        details: e.response.data,
+      };
+    }
+  },
 };

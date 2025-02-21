@@ -5,10 +5,12 @@ import { onMounted, type Ref } from 'vue';
 import type { EntryType } from '@/types/entry.ts';
 import { EntryStatusEnum } from '@/enums/EntryStatus.ts';
 import { useToast } from 'primevue';
+import { useEventBus } from '@vueuse/core';
 
 const router = useRouter();
 const route = useRoute();
 const toast = useToast();
+const entriesListBus = useEventBus('entries-list');
 
 const mode = computed(() => route.params.id ? 'edit' : 'create');
 const modalHeader = computed(() =>
@@ -35,6 +37,21 @@ const save = async () => {
       formErrors.value = result.details.errors;
     }
   } else {
+    const result = await entriesClient.update(entry.value.id, entry.value);
+    if (result.success) {
+      formErrors.value = {};
+      entry.value = result.data;
+      toast.add({
+        severity: 'info',
+        summary: 'Success',
+        detail: 'Entry successfully updated',
+        life: 3000,
+      });
+      entriesListBus.emit('refresh');
+      router.push({ name: 'entry.list' });
+    } else {
+      formErrors.value = result.details.errors;
+    }
   }
 };
 const entry: Ref<EntryType> = ref({});

@@ -7,8 +7,10 @@ import type { DataTablePageEvent } from 'primevue';
 import { EntryStatusEnum } from '../enums/EntryStatus.ts';
 import { PencilSquareIcon } from '@heroicons/vue/24/solid';
 import { TrashIcon } from '@heroicons/vue/24/solid';
+import { useEventBus } from '@vueuse/core';
 
 const router = useRouter();
+const bus = useEventBus('entries-list');
 
 const entries: Ref<GetManyResponseType<EntryType>> = ref();
 const queryParams: GetManyParamsType = reactive({
@@ -22,6 +24,11 @@ const updateTable = useDebounceFn(async () => {
 }, 100);
 onMounted(() => {
   updateTable();
+});
+bus.on((event) => {
+  if (event === 'refresh') {
+    updateTable();
+  }
 });
 const onUpdatePage = (ev: DataTablePageEvent) => {
   queryParams.page = ev.page + 1;
@@ -58,6 +65,7 @@ const deleteRecord = (id: number) => {
       <DataTable
           :value="entries.data"
           data-key="id"
+          state-key="entries-table"
           lazy
           paginator
           paginator-template="PageLinks FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink RowsPerPageDropdown"
