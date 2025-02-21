@@ -1,6 +1,10 @@
 import { http } from '@/http.ts';
-import type { GetManyParamsType, GetManyResponseType } from '@/types/common.ts';
-import type { EntryType } from '@/types/entry.ts';
+import type {
+  GenericResultType,
+  GetManyParamsType,
+  GetManyResponseType,
+} from '@/types/common.ts';
+import type { EntryBaseType, EntryType } from '@/types/entry.ts';
 import { clientHelper } from '@/client/helper.ts';
 
 export const entriesClient = {
@@ -18,6 +22,22 @@ export const entriesClient = {
       return response.data.data;
     } catch (AxiosError) {
       return null;
+    }
+  },
+  async create(
+    formData: EntryBaseType,
+  ): GenericResultType<EntryType> {
+    try {
+      const response = await http.post('entries', formData);
+      return {
+        success: true,
+        data: response.data.data,
+      };
+    } catch (e: AxiosError) {
+      return {
+        success: false,
+        details: e.response.data,
+      };
     }
   },
 };

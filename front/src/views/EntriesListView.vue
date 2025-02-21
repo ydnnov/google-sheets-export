@@ -5,6 +5,10 @@ import type { EntryType } from '@/types/entry.ts';
 import type { Ref } from 'vue';
 import type { DataTablePageEvent } from 'primevue';
 import { EntryStatusEnum } from '../enums/EntryStatus.ts';
+import { PencilSquareIcon } from '@heroicons/vue/24/solid';
+import { TrashIcon } from '@heroicons/vue/24/solid';
+
+const router = useRouter();
 
 const entries: Ref<GetManyResponseType<EntryType>> = ref();
 const queryParams: GetManyParamsType = reactive({
@@ -34,10 +38,22 @@ const onUpdateSortOrder = (order: number) => {
   queryParams.page = 1;
   updateTable();
 };
+const createRecord = () => {
+  router.push({ name: 'entry.create' });
+};
+const editRecord = (id: number) => {
+  router.push({ name: 'entry.edit', params: { id } });
+};
+const deleteRecord = (id: number) => {
+  console.log({ id });
+};
 </script>
 <template>
-  <div class="about">
+  <div>
     <h1>Entries</h1>
+    <div>
+      <Button @click="createRecord">Create</Button>
+    </div>
     <div v-if="entries">
       <DataTable
           :value="entries.data"
@@ -63,7 +79,29 @@ const onUpdateSortOrder = (order: number) => {
         </Column>
         <Column field="content" header="Content"></Column>
         <Column field="created_at" header="Created at" sortable></Column>
+        <Column header="Actions">
+          <template #body="{ data }">
+            <div class="flex justify-center">
+              <Button
+                  class="p-1"
+                  @click="editRecord(data.id)"
+                  rounded
+              >
+                <PencilSquareIcon class="size-4 text-white" />
+              </Button>
+              <Button
+                  class="p-1 ml-2"
+                  @click="deleteRecord(data.id)"
+                  rounded
+                  severity="danger"
+              >
+                <TrashIcon class="size-4 text-white" />
+              </Button>
+            </div>
+          </template>
+        </Column>
       </DataTable>
     </div>
   </div>
+  <router-view />
 </template>

@@ -13,4 +13,5 @@ import { RouterLink, RouterView } from 'vue-router'
   </header>
 
   <RouterView />
+  <Toast />
 </template>

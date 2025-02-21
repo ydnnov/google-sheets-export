@@ -33,3 +33,15 @@ export type GetManyResponseType<TRecord> = {
     total: number
   }
 }
+
+export type GenericSuccessType<TData> = {
+  success: true
+  data: TData
+}
+export type GenericErrorType = {
+  success: false
+  details: any
+}
+export type GenericResultType<TData> =
+  GenericSuccessType<TData> |
+  GenericErrorType
