@@ -3,14 +3,17 @@ import { entriesClient } from '@/client/entries.ts';
 import type { GetManyParamsType, GetManyResponseType } from '@/types/common.ts';
 import type { EntryType } from '@/types/entry.ts';
 import type { Ref } from 'vue';
-import type { DataTablePageEvent } from 'primevue';
+import { type DataTablePageEvent, useConfirm, useToast } from 'primevue';
 import { EntryStatusEnum } from '../enums/EntryStatus.ts';
 import { PencilSquareIcon } from '@heroicons/vue/24/solid';
 import { TrashIcon } from '@heroicons/vue/24/solid';
-import { useEventBus } from '@vueuse/core';
+import { useEventBus, useSessionStorage } from '@vueuse/core';
 
 const router = useRouter();
 const bus = useEventBus('entries-list');
+const confirm = useConfirm();
+const toast = useToast();
+const storage = useSessionStorage('entries-table');
 
 const entries: Ref<GetManyResponseType<EntryType>> = ref();
 const queryParams: GetManyParamsType = reactive({
@@ -19,6 +22,16 @@ const queryParams: GetManyParamsType = reactive({
   sortField: 'id',
   sortOrder: 'asc',
 });
+if (storage.value) {
+  try {
+    const tableState = JSON.parse(storage.value);
+    queryParams.page = (tableState.first / tableState.rows) + 1;
+    queryParams.perPage = tableState.rows;
+    queryParams.sortField = tableState.sortField;
+    queryParams.sortOrder = tableState.sortOrder > 0 ? 'asc' : 'desc';
+  } catch (e) {
+  }
+}
 const updateTable = useDebounceFn(async () => {
   entries.value = await entriesClient.getMany(queryParams);
 }, 100);
@@ -51,8 +64,28 @@ const createRecord = () => {
 const editRecord = (id: number) => {
   router.push({ name: 'entry.edit', params: { id } });
 };
-const deleteRecord = (id: number) => {
-  console.log({ id });
+const confirmDelete = (event, id: number) => {
+  confirm.require({
+    target: event.currentTarget,
+    message: 'Do you want to delete this record?',
+    icon: 'pi pi-info-circle',
+    rejectProps: {
+      label: 'Cancel',
+      severity: 'secondary',
+      outlined: true,
+    },
+    acceptProps: {
+      label: 'Delete',
+      severity: 'danger',
+    },
+    accept: async () => {
+      await entriesClient.delete(id);
+      toast.add({ severity: 'info', summary: 'Confirmed', detail: 'Record deleted', life: 3000 });
+      updateTable();
+    },
+    reject: () => {
+    },
+  });
 };
 </script>
 <template>
@@ -99,7 +132,7 @@ const deleteRecord = (id: number) => {
               </Button>
               <Button
                   class="p-1 ml-2"
-                  @click="deleteRecord(data.id)"
+                  @click="confirmDelete($event, data.id)"
                   rounded
                   severity="danger"
               >
@@ -111,5 +144,6 @@ const deleteRecord = (id: number) => {
       </DataTable>
     </div>
   </div>
+  <ConfirmPopup></ConfirmPopup>
   <router-view />
 </template>

@@ -57,4 +57,12 @@ export const entriesClient = {
       };
     }
   },
+  async delete(id: number): boolean {
+    try {
+      await http.delete(`entries/${id}`);
+      return true;
+    } catch (AxiosError) {
+      return false;
+    }
+  },
 };
