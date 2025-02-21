@@ -2,12 +2,12 @@
 import { entriesClient } from '@/client/entries.ts';
 import type { GetManyParamsType, GetManyResponseType } from '@/types/common.ts';
 import type { EntryType } from '@/types/entry.ts';
-import type { Ref } from 'vue';
+import { type Ref } from 'vue';
 import { type DataTablePageEvent, useConfirm, useToast } from 'primevue';
 import { EntryStatusEnum } from '../enums/EntryStatus.ts';
+import { settingsClient } from '@/client/settings.ts';
 import { PencilSquareIcon } from '@heroicons/vue/24/solid';
 import { TrashIcon } from '@heroicons/vue/24/solid';
-import { useEventBus, useSessionStorage } from '@vueuse/core';
 
 const router = useRouter();
 const bus = useEventBus('entries-list');
@@ -23,6 +23,7 @@ const queryParams: GetManyParamsType = reactive({
   sortOrder: 'asc',
 });
 const showProgressBar = ref(false);
+const googleSheetUrl = ref();
 if (storage.value) {
   try {
     const tableState = JSON.parse(storage.value);
@@ -36,8 +37,21 @@ if (storage.value) {
 const updateTable = useDebounceFn(async () => {
   entries.value = await entriesClient.getMany(queryParams);
 }, 100);
-onMounted(() => {
+const loadGoogleSheetUrl = async () => {
+  const result = await settingsClient.get('google-sheet-url');
+  if (result?.length) {
+    googleSheetUrl.value = result;
+  } else {
+    googleSheetUrl.value = '';
+  }
+};
+const saveGoogleSheetUrl = useThrottleFn(async (value: string) => {
+  settingsClient.set('google-sheet-url', value);
+}, 250);
+watch(() => googleSheetUrl.value, saveGoogleSheetUrl);
+onMounted(async () => {
   updateTable();
+  loadGoogleSheetUrl();
 });
 bus.on((event) => {
   if (event === 'refresh') {
@@ -132,20 +146,25 @@ const confirmGenerate = (event) => {
   />
   <div>
     <h1>Entries</h1>
-    <div class="flex justify-end">
-      <Button @click="createRecord">Create</Button>
-      <Button
-          class="ml-4"
-          @click="confirmDelete($event, 'all')"
-          severity="danger"
-      >Delete all
-      </Button>
-      <Button
-          class="ml-4"
-          @click="confirmGenerate($event)"
-          severity="info"
-      >Generate
-      </Button>
+    <div class="flex">
+      <div class="grow">
+        <InputText type="text" v-model="googleSheetUrl" />
+      </div>
+      <div class="flex">
+        <Button @click="createRecord">Create</Button>
+        <Button
+            class="ml-4"
+            @click="confirmDelete($event, 'all')"
+            severity="danger"
+        >Delete all
+        </Button>
+        <Button
+            class="ml-4"
+            @click="confirmGenerate($event)"
+            severity="info"
+        >Generate
+        </Button>
+      </div>
     </div>
     <div v-if="entries">
       <DataTable
