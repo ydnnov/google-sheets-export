@@ -7,7 +7,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: HomeView,
+      redirect: { name: 'entry.list' },
     },
     {
       path: '/entries',
