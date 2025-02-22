@@ -8,6 +8,7 @@ import { EntryStatusEnum } from '../enums/EntryStatus.ts';
 import { settingsClient } from '@/client/settings.ts';
 import { PencilSquareIcon } from '@heroicons/vue/24/solid';
 import { TrashIcon } from '@heroicons/vue/24/solid';
+import { http } from '@/http.ts';
 
 const router = useRouter();
 const bus = useEventBus('entries-list');
@@ -47,7 +48,7 @@ const loadGoogleSheetUrl = async () => {
 };
 const saveGoogleSheetUrl = useThrottleFn(async (value: string) => {
   settingsClient.set('google-sheet-url', value);
-}, 250);
+}, 250, true);
 watch(() => googleSheetUrl.value, saveGoogleSheetUrl);
 onMounted(async () => {
   updateTable();
@@ -136,6 +137,10 @@ const confirmGenerate = (event) => {
     },
   });
 };
+// TODO: remove this later as it's not in the requierements
+const testExport = () => {
+  http.post('/google-sheets/export');
+};
 </script>
 <template>
   <ProgressBar
@@ -151,6 +156,7 @@ const confirmGenerate = (event) => {
         <InputText type="text" v-model="googleSheetUrl" />
       </div>
       <div class="flex">
+        <Button @click="testExport" class="mr-4">Test export</Button>
         <Button @click="createRecord">Create</Button>
         <Button
             class="ml-4"

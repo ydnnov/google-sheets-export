@@ -12,4 +12,9 @@ class Entry extends Model
     protected $casts = [
         'status' => Status::class,
     ];
+
+    public function scopeAllowed($query)
+    {
+        return $query->where('status', 'allowed');
+    }
 }
