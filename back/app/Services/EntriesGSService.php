@@ -3,7 +3,7 @@
 namespace app\Services;
 
 use App\Classes\EntriesGS;
-use App\Errors\InvalidSpreadsheetIdException;
+use App\Errors\InvalidSpreadsheetUrlException;
 use App\Errors\MissingSpreadsheetSettingException;
 use App\Models\Setting;
 use Google\Client;
@@ -35,9 +35,6 @@ class EntriesGSService
         }
 
         $spreadsheetId = $this->normalizeSheetId($setting->value);
-        if (!$spreadsheetId) {
-            throw new InvalidSpreadsheetIdException();
-        }
 
         return new EntriesGS($this->service, $spreadsheetId);
     }
@@ -47,10 +44,15 @@ class EntriesGSService
         if (!str_contains($sheetIdOrUrl, '/')) {
             return $sheetIdOrUrl;
         }
-        $result = preg_match('/^https:\/\/docs\.google\.com\/spreadsheets\/d\/(\w+)/', $sheetIdOrUrl, $matches);
-        if ($result) {
-            return $matches[1];
+        $result = preg_match(
+            '/^https:\/\/docs\.google\.com\/spreadsheets\/d\/(\w+)/',
+            $sheetIdOrUrl,
+            $matches
+        );
+        if (!$result) {
+            throw new InvalidSpreadsheetUrlException();
         }
-        return null;
+
+        return $matches[1];
     }
 }
