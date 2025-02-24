@@ -1,6 +1,6 @@
 <?php
 
-namespace app\Errors;
+namespace App\Errors;
 
 class InvalidSpreadsheetUrlException extends \Exception
 {
