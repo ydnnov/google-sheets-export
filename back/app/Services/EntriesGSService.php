@@ -18,15 +18,6 @@ class EntriesGSService
         $this->authenticate();
     }
 
-    protected function authenticate()
-    {
-        $client = new Client();
-        $client->setAuthConfig(storage_path('app/gscreds.json'));
-        $client->addScope(Sheets::SPREADSHEETS);
-
-        $this->service = new Sheets($client);
-    }
-
     public function fromSetting(): EntriesGS
     {
         $setting = Setting::where('key', 'google-sheet-url')->first();
@@ -37,6 +28,15 @@ class EntriesGSService
         $spreadsheetId = $this->normalizeSheetId($setting->value);
 
         return new EntriesGS($this->service, $spreadsheetId);
+    }
+
+    protected function authenticate()
+    {
+        $client = new Client();
+        $client->setAuthConfig(storage_path('app/gscreds.json'));
+        $client->addScope(Sheets::SPREADSHEETS);
+
+        $this->service = new Sheets($client);
     }
 
     protected function normalizeSheetId($sheetIdOrUrl)
