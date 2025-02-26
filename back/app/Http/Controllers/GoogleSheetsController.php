@@ -9,7 +9,14 @@ class GoogleSheetsController extends Controller
     public function export(EntriesGSService $entriesGSService)
     {
         $entriesGS = $entriesGSService->fromSetting();
-        $result = $entriesGS->export();
+
+        $entriesGS->setLogTo('file');
+
+        $result = $entriesGS->export(
+            config('gs-export.sheet_batch_size'),
+            config('gs-export.db_batch_size')
+        );
+
         return $result;
     }
 }

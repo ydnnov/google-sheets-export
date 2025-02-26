@@ -13,7 +13,7 @@ class Entry extends Model
         'status' => Status::class,
     ];
 
-    public function scopeAllowed($query)
+    public function scopeIncludedInExport($query)
     {
         return $query->where('status', 'allowed');
     }
