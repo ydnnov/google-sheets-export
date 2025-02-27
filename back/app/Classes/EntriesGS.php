@@ -69,6 +69,16 @@ class EntriesGS
         return $result;
     }
 
+    public function getRows(int $from, int $count): array
+    {
+        $range = 'Sheet1!A' . ($from + 2) . ':E' . ($from + $count + 1);
+        $response = $this->service->spreadsheets_values
+            ->get($this->spreadsheetId, $range);
+        $result = $response->getValues();
+
+        return $result;
+    }
+
     protected function writeHeader()
     {
         $values = [['ID', 'Status', 'Content', 'Created at']];
