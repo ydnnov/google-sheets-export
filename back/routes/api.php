@@ -17,5 +17,4 @@ Route::post('entries/delete-all', [EntryController::class, 'deleteAll']);
 Route::get('/settings/{key}', [SettingController::class, 'get']);
 Route::post('/settings', [SettingController::class, 'set']);
 
-// TODO: remove this later as it's not in the requierements
-Route::post('/google-sheets/export', [GoogleSheetsController::class, 'export']);
+Route::get('/fetch/{count?}', [GoogleSheetsController::class, 'readGoogleSheet']);

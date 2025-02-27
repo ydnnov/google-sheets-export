@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Services\EntriesGSService;
+use Illuminate\Support\Facades\Artisan;
+use Symfony\Component\Console\Output\BufferedOutput;
 
 class GoogleSheetsController extends Controller
 {
@@ -18,5 +20,16 @@ class GoogleSheetsController extends Controller
         );
 
         return $result;
+    }
+
+    public function readGoogleSheet(int $count = 10)
+    {
+        $output = new BufferedOutput();
+
+        Artisan::call('app:read-google-sheet', [
+            '--count' => $count
+        ], $output);
+
+        return nl2br($output->fetch());
     }
 }
