@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'google' => [
+        'credentials' => env('GOOGLE_CREDENTIALS_STORAGE_PATH'),
+        'logFullBody' => env('GOOGLE_LOG_FULL_BODY'),
+    ],
 ];

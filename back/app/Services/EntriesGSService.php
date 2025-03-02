@@ -11,11 +11,12 @@ use Google\Service\Sheets;
 
 class EntriesGSService
 {
-    protected Sheets $service;
 
-    public function __construct()
+    public function __construct(
+        protected Sheets $service,
+        protected Client $client,
+    )
     {
-        $this->authenticate();
     }
 
     public function fromSetting(): EntriesGS
@@ -28,15 +29,6 @@ class EntriesGSService
         $spreadsheetId = $this->normalizeSheetId($setting->value);
 
         return new EntriesGS($this->service, $spreadsheetId);
-    }
-
-    protected function authenticate()
-    {
-        $client = new Client();
-        $client->setAuthConfig(storage_path('app/gscreds.json'));
-        $client->addScope(Sheets::SPREADSHEETS);
-
-        $this->service = new Sheets($client);
     }
 
     protected function normalizeSheetId($sheetIdOrUrl)
