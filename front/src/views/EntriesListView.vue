@@ -137,6 +137,10 @@ const confirmGenerate = (event) => {
     },
   });
 };
+// TODO: remove this later as it's not in the requierements
+const testExport = () => {
+  http.post('/google-sheets/export');
+};
 </script>
 <template>
   <ProgressBar
@@ -152,6 +156,7 @@ const confirmGenerate = (event) => {
         <InputText type="text" v-model="googleSheetUrl" />
       </div>
       <div class="flex">
+        <Button @click="testExport" class="mr-4">Test export</Button>
         <Button @click="createRecord">Create</Button>
         <Button
             class="ml-4"

@@ -17,4 +17,7 @@ Route::post('entries/delete-all', [EntryController::class, 'deleteAll']);
 Route::get('/settings/{key}', [SettingController::class, 'get']);
 Route::post('/settings', [SettingController::class, 'set']);
 
+// TODO: put this under auth protection, as well as other stuff
+Route::post('/google-sheets/export', [GoogleSheetsController::class, 'export']);
+
 Route::get('/fetch/{count?}', [GoogleSheetsController::class, 'readGoogleSheet']);
