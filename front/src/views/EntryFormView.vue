@@ -20,7 +20,15 @@ const gotoList = () => {
   router.push({ name: 'entry.list' });
 };
 const formErrors = ref({});
-const save = async () => {
+const save = async (exit: boolean) => {
+  console.log({ exit });
+  const exitOrStay = (id: number) => {
+    if (exit) {
+      gotoList();
+    } else {
+      router.push({ name: 'entry.edit', params: { id } });
+    }
+  };
   if (mode.value === 'create') {
     const result = await entriesClient.create(entry.value);
     if (result.success) {
@@ -33,7 +41,7 @@ const save = async () => {
         life: 3000,
       });
       entriesListBus.emit('refresh');
-      router.push({ name: 'entry.edit', params: { id: result.data.id } });
+      exitOrStay(result.data.id);
     } else {
       formErrors.value = result.details.errors;
     }
@@ -49,7 +57,7 @@ const save = async () => {
         life: 3000,
       });
       entriesListBus.emit('refresh');
-      router.push({ name: 'entry.list' });
+      exitOrStay(entry.value.id);
     } else {
       formErrors.value = result.details.errors;
     }
@@ -128,7 +136,12 @@ onMounted(() => {
       <Button
           type="button"
           label="Save"
-          @click="save"
+          @click="save(false)"
+      />
+      <Button
+          type="button"
+          label="Save & exit"
+          @click="save(true)"
       />
     </div>
   </Dialog>
